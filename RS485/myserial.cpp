@@ -6,7 +6,7 @@ void init_serial(){
     Serial1.begin(speed_serial);
     Serial2.begin(speed_serial);
     Serial3.begin(speed_serial);
-    Serial3.setTimeout(timeout)
+    Serial3.setTimeout(timeout);
 }
 
 void sendToSerial(String mensaje, serials choose_serial){
