@@ -1,10 +1,10 @@
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(17, OUTPUT);
 }
 
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);  
+  digitalWrite(17, HIGH);  
   delay(1000);                       
-  digitalWrite(LED_BUILTIN, LOW);
+  digitalWrite(17, LOW);
   delay(1000);
 }
