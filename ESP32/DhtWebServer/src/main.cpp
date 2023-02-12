@@ -12,6 +12,7 @@ Based on:
 // Uncomment and replace with your network credentials inside "wifi_credentials.h"
 //const char* ssid = "ssid";
 //const char* password = "password";
+#include "email.h"
 
 #define DHTPIN 2        // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT11   // DHT11 or DHT22 or DHT21
@@ -149,7 +150,11 @@ void setup(){
     }
 
     // Print ESP32 Local IP Address
-    Serial.println(WiFi.localIP());
+    String IP = (WiFi.localIP()).toString();
+    Serial.println(IP);
+
+    // Sending IP by email
+    sendEmail(IP);
 
     // Route for root / web page
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
