@@ -13,6 +13,13 @@ Based on:
 //const char* ssid = "ssid";
 //const char* password = "password";
 #include "email.h"
+#include "index_html.h"
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
+const long utcOffsetInSeconds = 3600;
+
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 #define DHTPIN 2        // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT11   // DHT11 or DHT22 or DHT21
@@ -20,6 +27,11 @@ Based on:
 
 // Initialize DHT sensor.
 DHT dht(DHTPIN, DHTTYPE);
+
+// Define NTP Client to get time
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
+
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -58,67 +70,13 @@ String readDHTHumidity() {
     }
 }
 
-const char index_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE HTML><html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-  <style>
-    html {
-     font-family: Arial;
-     display: inline-block;
-     margin: 0px auto;
-     text-align: center;
-    }
-    h2 { font-size: 3.0rem; }
-    p { font-size: 3.0rem; }
-    .units { font-size: 1.2rem; }
-    .dht-labels{
-      font-size: 1.5rem;
-      vertical-align:middle;
-      padding-bottom: 15px;
-    }
-  </style>
-</head>
-<body>
-  <h2>ESP32 DHT Server</h2>
-  <p>
-    <i class="fas fa-thermometer-half" style="color:#059e8a;"></i>
-    <span class="dht-labels">Temperature</span>
-    <span id="temperature">%TEMPERATURE%</span>
-    <sup class="units">&deg;C</sup>
-  </p>
-  <p>
-    <i class="fas fa-tint" style="color:#00add6;"></i>
-    <span class="dht-labels">Humidity</span>
-    <span id="humidity">%HUMIDITY%</span>
-    <sup class="units">&percnt;</sup>
-  </p>
-</body>
-<script>
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("temperature").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/temperature", true);
-  xhttp.send();
-}, 10000 ) ;
+String getTimeString() {
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("humidity").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/humidity", true);
-  xhttp.send();
-}, 10000 ) ;
-</script>
-</html>)rawliteral";
+    String h = String(timeClient.getHours());
+    String m = String(timeClient.getMinutes());
+
+    return h + ":"  + m;
+}
 
 // Replaces placeholder with DHT values
 String processor(const String& var){
@@ -149,6 +107,9 @@ void setup(){
         Serial.println("Connecting to WiFi..");
     }
 
+    // To get time from internet
+    timeClient.begin();
+
     // Print ESP32 Local IP Address
     String IP = (WiFi.localIP()).toString();
     Serial.println(IP);
@@ -166,11 +127,18 @@ void setup(){
     server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
         request->send_P(200, "text/plain", readDHTHumidity().c_str());
     });
-
+    server.on("/time", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send_P(200, "text/plain", getTimeString().c_str());
+    });
     // Start server
     server.begin();
 }
 
-void loop(){
+void loop() {
+    timeClient.update();
 
+    //Serial.print(timeClient.getHours());
+    //Serial.print(timeClient.getMinutes());
+    Serial.println(getTimeString());
+    delay(5000);
 }

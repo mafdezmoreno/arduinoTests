@@ -32,4 +32,4 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(Z_DUMMY_TARGET ${SRC_LIST} include/wifi_credentials.h include/email.h include/email_credentials.h)
+add_executable(Z_DUMMY_TARGET ${SRC_LIST} include/wifi_credentials.h include/email.h include/email_credentials.h include/index_html.h)
