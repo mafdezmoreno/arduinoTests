@@ -21,10 +21,11 @@ const long utcOffsetInSeconds = 3600;
 
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
-#define DHTPIN 2        // Digital pin connected to the DHT sensor
-#define DHTTYPE DHT11   // DHT11 or DHT22 or DHT21
-#define DHTPOWER 15     // Digital pin to give power to DHT
-
+#define DHTPIN      2       // Digital pin connected to the DHT sensor
+#define DHTTYPE     DHT11   // DHT11 or DHT22 or DHT21
+#define DHTPOWER    15      // Digital pin to give power to DHT
+#define PIN_BAT     34      // Pin to monitor battery voltage level
+//#define DEBUG_MODE
 // Initialize DHT sensor.
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -32,9 +33,14 @@ DHT dht(DHTPIN, DHTTYPE);
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
 
-
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
+
+void debPrint(const String& msg){
+#ifdef DEBUG_MODE
+    Serial.println(msg);
+#endif
+}
 
 String readDHTTemperature() {
 
@@ -44,11 +50,11 @@ String readDHTTemperature() {
     digitalWrite(DHTPOWER, LOW);
 
     if (isnan(t)) {
-        Serial.println("Failed to read from DHT sensor!");
+        debPrint("Failed to read from DHT sensor!");
         return "--";
     }
     else {
-        Serial.println(t);
+        debPrint(String(t));
         return String(t);
     }
 }
@@ -61,39 +67,62 @@ String readDHTHumidity() {
     digitalWrite(DHTPOWER, LOW);
 
     if (isnan(h)) {
-        Serial.println("Failed to read from DHT sensor!");
+        debPrint("Failed to read from DHT sensor!");
         return "--";
     }
     else {
-        Serial.println(h);
+        debPrint(String(h));
         return String(h);
     }
 }
 
 String getTimeString() {
-
-    String h = String(timeClient.getHours());
-    String m = String(timeClient.getMinutes());
-
-    return h + ":"  + m;
+    //timeClient.update(); // produces timeout here
+    String hour = "";
+    String min = "";
+    unsigned h = timeClient.getHours();
+    unsigned m = timeClient.getMinutes();
+    hour = String(h);
+    if (h<10){
+        hour = "0"+ String(h);
+    }
+    min = String(m);
+    if (m < 10){
+        min = "0" + min;
+    }
+    String time = hour + ":" + min;
+    debPrint(time);
+    return time;
 }
 
 // Replaces placeholder with DHT values
 String processor(const String& var){
-    //Serial.println(var);
+
     if(var == "TEMPERATURE"){
         return readDHTTemperature();
     }
     else if(var == "HUMIDITY"){
         return readDHTHumidity();
     }
-    return String();
+    return "";
 }
 
-void setup(){
-    // Serial port for debugging purposes
-    Serial.begin(115200);
+// Returns battery level in Volt
+String readBatLevel(){
 
+    float batteryLevel = 0;
+    unsigned meas = map(analogRead(PIN_BAT), 0, 4095, 0, 450);
+    String batLevel = String(meas/100.);
+    debPrint("Bat: ");
+    debPrint(batLevel);
+    return batLevel;
+}
+
+
+void setup(){
+#ifdef DEBUG_MODE
+    Serial.begin(115200);
+#endif
     dht.begin();
 
     // DHT power
@@ -104,7 +133,7 @@ void setup(){
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);
-        Serial.println("Connecting to WiFi..");
+        debPrint("Connecting to WiFi..");
     }
 
     // To get time from internet
@@ -112,23 +141,30 @@ void setup(){
 
     // Print ESP32 Local IP Address
     String IP = (WiFi.localIP()).toString();
-    Serial.println(IP);
+    debPrint(IP);
 
     // Sending IP by email
     sendEmail(IP);
-
+    delay(200);
     // Route for root / web page
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         request->send_P(200, "text/html", index_html, processor);
     });
     server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+        debPrint("Sending temperature");
         request->send_P(200, "text/plain", readDHTTemperature().c_str());
     });
     server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
+        debPrint("Sending humidity");
         request->send_P(200, "text/plain", readDHTHumidity().c_str());
     });
     server.on("/time", HTTP_GET, [](AsyncWebServerRequest *request){
+        debPrint("Sending time");
         request->send_P(200, "text/plain", getTimeString().c_str());
+    });
+    server.on("/bat", HTTP_GET, [](AsyncWebServerRequest *request){
+        debPrint("Sending bat");
+        request->send_P(200, "text/plain", readBatLevel().c_str());
     });
     // Start server
     server.begin();
@@ -136,9 +172,5 @@ void setup(){
 
 void loop() {
     timeClient.update();
-
-    //Serial.print(timeClient.getHours());
-    //Serial.print(timeClient.getMinutes());
-    Serial.println(getTimeString());
     delay(5000);
 }
