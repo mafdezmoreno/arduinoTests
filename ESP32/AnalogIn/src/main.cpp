@@ -14,6 +14,8 @@ void setup() {
 
 void loop() {
 
-    Serial.println(analogRead(pinBat));
+    Serial.println("Battery level: ");
+    unsigned value = map(analogRead(pinBat), 0, 4095, 0, 450);
+    Serial.println(value/100.);
     delay(500);
 }
