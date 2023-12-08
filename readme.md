@@ -1,4 +1,4 @@
-# My Arduino Developments
+# Arduino Developments/Tests
 
 1. Setting up boards whit essentials:
     - blink

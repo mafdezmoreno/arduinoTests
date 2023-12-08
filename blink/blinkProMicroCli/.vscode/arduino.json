@@ -1,0 +1,7 @@
+{
+    "port": "/dev/tty.usbmodem1101",
+    "configuration": "cpu=8MHzatmega32U4",
+    "board": "SparkFun:avr:promicro",
+    "sketch": "blinkProMicroCli.ino",
+    "output": "/build"
+}
