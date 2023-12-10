@@ -12,7 +12,9 @@
     * I2C:
         - Arduino Pro Micro
     * HTU21DF (temperature and humidity sensor):
-        - On ESP32
+        - On ESP32 Wemos Lolin
+    * DHT (temperature and humidity sensor):
+        - On ESP32 Wemos Lolin
 
 4. Testing arduino-cli (and Arduino VSCode extension) to code using VSCode and command line.
 
