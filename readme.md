@@ -3,6 +3,8 @@
 1. Setting up boards whit essentials:
     - Blink
     - Serial
+    - Analog Read:
+        - ESP32 Wemos Lolin
 
 2. Testing modules:
     - LCD

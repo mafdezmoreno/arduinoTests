@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Arduino",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "~/Library/Arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/**",
+                "~/Library/Arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/**",
+                "~/Library/Arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/**",
+                "~/Library/Arduino15/packages/esp32/hardware/esp32/2.0.11/variants/lolin32/**",
+                "~/Library/Arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/spi_flash/include/",
+                "~/Library/Arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/esp_hw_support/include/soc/",
+                "~/Documents/Arduino/libraries/**"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "compilerPath":"~/Library/Arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/esp-2021r2-patch5-8.4.0/bin/xtensa-esp32-elf-cpp"
+        }
+    ],
+    "version": 4
+}

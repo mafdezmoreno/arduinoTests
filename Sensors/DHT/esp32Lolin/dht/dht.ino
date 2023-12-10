@@ -6,8 +6,8 @@
 #include "DHT.h"
 #include <Arduino.h>
 
-#define DHTPIN 2     // Digital pin connected to the DHT sensor
-#define DHTTYPE DHT11   // DHT11 or DHT22 or DHT21
+#define DHTPIN 2      // Digital pin connected to the DHT sensor
+#define DHTTYPE DHT11 // DHT11 or DHT22 or DHT21
 #define DHTPOWER 15
 
 // Connect pin 1 (on the left) of the sensor to +5V
@@ -20,7 +20,8 @@
 // Initialize DHT sensor.
 DHT dht(DHTPIN, DHTTYPE);
 
-void setup() {
+void setup()
+{
     Serial.begin(9600);
     Serial.println(F("DHT test!"));
 
@@ -29,7 +30,8 @@ void setup() {
     digitalWrite(DHTPOWER, HIGH); // sets the digital pin 13 on
 }
 
-void loop() {
+void loop()
+{
     // Wait a few seconds between measurements.
     delay(3000);
 
@@ -42,7 +44,8 @@ void loop() {
     // float f = dht.readTemperature(true);
 
     // Check if any reads failed and exit early (to try again).
-    if (isnan(h) || isnan(t)) {
+    if (isnan(h) || isnan(t))
+    {
         Serial.println(h);
         Serial.println(t);
         Serial.println(F("Failed to read from DHT sensor!"));
@@ -52,7 +55,7 @@ void loop() {
     // Compute heat index in Fahrenheit (the default)
     // float hif = dht.computeHeatIndex(f, h);
     // Compute heat index in Celsius (isFahreheit = false)
-    //float hic = dht.computeHeatIndex(t, h, false);
+    // float hic = dht.computeHeatIndex(t, h, false);
 
     Serial.print(F("Humidity: "));
     Serial.print(h);
@@ -60,10 +63,10 @@ void loop() {
     Serial.print(t);
     Serial.println(F("°C "));
     // Serial.print(f);
-    //Serial.print(F("°F  Heat index: "));
-    //Serial.print(F("Heat index: "));
-    //Serial.print(hic);
-    //Serial.print(F("°C "));
+    // Serial.print(F("°F  Heat index: "));
+    // Serial.print(F("Heat index: "));
+    // Serial.print(hic);
+    // Serial.print(F("°C "));
     // Serial.print(hif);
     // Serial.println(F("°F"));
 }
